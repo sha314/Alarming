@@ -14,7 +14,15 @@ Website: www.zetcode.com
 from tkinter import Tk, Text, TOP, BOTH, X, N, LEFT
 from tkinter.ttk import Frame, Label, Entry, Button
 import tkinter as tk
+from PIL import Image, ImageTk
+import os
 
+ICON_PATHS={
+    "delete":"../resources/icon/png/delete.png",
+    "reset":"../resources/icon/png/reset.png",
+    "start":"../resources/icon/png/start.png",
+    "stop":"../resources/icon/png/stop.png",
+}
 
 class Converters:
     def __init__(self):
@@ -56,6 +64,7 @@ class StopwatchSlot(Frame, Converters):
         self.pady = 2
         self.padxs  = [1, 2, 15, 2, 2, 2]
         self.widths = [5, 6, 15, 5, 5, 5]
+        self.height = 1
         self.head_flag = False
         print("got here")
         self.slot_frame_list = []
@@ -88,6 +97,12 @@ class StopwatchSlot(Frame, Converters):
         self.slot_count += 1
         self.construct_new_slote()
 
+    def btn_start_timer_clicked(self):
+        pass
+
+    def btn_reset_timer_clicked(self):
+        pass
+
 
     def construct_new_slote(self):
         self.pack(fill=BOTH, expand=True)
@@ -102,25 +117,36 @@ class StopwatchSlot(Frame, Converters):
         self.slot_frame_list.append(frame_slot)
 
         lbl1 = Label(frame_slot, text="{}".format(self.slot_count), width=self.widths[0])
-        lbl1.pack(side=LEFT, padx=self.padxs[0], pady=self.pady)
-
         lbl2 = Label(frame_slot, text="N/A".format(self.slot_count), width=self.widths[1])
-        lbl2.pack(side=LEFT, padx=self.padxs[1], pady=self.pady)
-
         self.entry_time = Entry(frame_slot, width=self.widths[2])
-        self.entry_time.pack(side=LEFT, padx=self.padxs[2], pady=self.pady)
+        btn_start_timer = tk.Button(frame_slot, text='Start', fg='red', width=self.widths[3], command=self.btn_start_timer_clicked) # start/stop
+        btn_reset_timer = tk.Button(frame_slot, width=self.widths[4], height=self.height, text='Reset', fg='red', command=self.btn_reset_timer_clicked) # reset
+        btn_remove_timer = tk.Button(frame_slot, width=self.widths[5], height=self.height, text='Delete', fg='red')  # reset
 
-        btn_start_timer = tk.Button(frame_slot, text='Start', fg='red', width=self.widths[3], command=self.timer_clicked) # start/stop
-        btn_start_timer.pack(padx=self.padxs[3], pady=self.pady, side=tk.LEFT)
-
-        btn_reset_timer = tk.Button(frame_slot, text='Reset', fg='red', width=self.widths[4], command=self.timer_clicked) # reset
-        btn_reset_timer.pack(padx=self.padxs[4], pady=self.pady, side=tk.LEFT)
-
-        btn_remove_timer = tk.Button(frame_slot, text='Remove', fg='red', width=self.widths[5],
-                                    # command=self.remove_slot
-                                     )  # reset
-        # btn_remove_timer['command']=self.remove_slot
+        ## commands
         btn_remove_timer['command'] = lambda arg=frame_slot: self.remove_slot(arg) # lambda function that calls another function with argument
+
+        ## icon
+        # photo = ImageTk.PhotoImage(Image.open(ICON_PATHS['start']))
+        # print(photo.height())
+        # # btn_start_timer['image'] = photo.subsample(1, 1) # Resizing image to fit on button
+        # btn_start_timer.config(image=photo, width="100", height="100")
+        #
+        # photo = tk.PhotoImage(file=r"../resources/icon/png/reset.png")
+        # icon = photo.subsample(1, 1)  # Resizing image to fit on button
+        # btn_reset_timer.config(image=icon)
+        #
+        # photo = tk.PhotoImage(file=r"../resources/icon/png/delete.png")
+        # # btn_start_timer['image'] = photo.subsample(1, 1) # Resizing image to fit on button
+        # icon = photo.subsample(1, 1)  # Resizing image to fit on button
+        # btn_remove_timer.config(image=icon)
+
+        ## packing
+        lbl1.pack(side=LEFT, padx=self.padxs[0], pady=self.pady)
+        lbl2.pack(side=LEFT, padx=self.padxs[1], pady=self.pady)
+        self.entry_time.pack(side=LEFT, padx=self.padxs[2], pady=self.pady)
+        btn_start_timer.pack(padx=self.padxs[3], pady=self.pady, side=tk.LEFT)
+        btn_reset_timer.pack(padx=self.padxs[4], pady=self.pady, side=tk.LEFT)
         btn_remove_timer.pack(padx=self.padxs[5], pady=self.pady, side=tk.LEFT)
 
     def remove_slot(self, reference=None):
@@ -181,6 +207,9 @@ def main():
     root = Tk()
 
     root.geometry("400x400+300+300")
+    # root.iconbitmap('../resources/png/icon.ico') # main icon
+    # root.iconphoto(False, tk.PhotoImage(file='/path/to/ico/icon.png')) # or this
+
     app = StopwatchSlot(root)
     # app.add_new()
     # app.add_new()
@@ -192,3 +221,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # os.listdir("../")
