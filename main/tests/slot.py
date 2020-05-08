@@ -52,11 +52,13 @@ class Converters:
         return "{:2}:{:2}:{:2}".format(hr, minute, r)
 
 
-class StopwatchSlot(Frame, Converters):
+class StopwatchSlot(Frame):
 
     def __init__(self, root):
-        self.root = root
+        # self.root = root
         super(StopwatchSlot, self).__init__(root)
+        self.converter = Converters()
+
         # super(Frame, self).__init__(master, **options)
         # Frame.__init(master, **options)
         self.slot_count = 0
@@ -127,6 +129,14 @@ class StopwatchSlot(Frame, Converters):
         btn_remove_timer['command'] = lambda arg=frame_slot: self.remove_slot(arg) # lambda function that calls another function with argument
 
         ## icon
+        photo = tk.PhotoImage(file=r"../resources/icon/png/delete.png")
+        # # btn_start_timer['image'] = photo.subsample(1, 1) # Resizing image to fit on button
+        icon = photo.subsample(2, 2)  # Resizing image to fit on button
+        # btn_remove_timer.config(image=icon)
+        # btn_remove_timer['image']=icon
+        btn = tk.Button(frame_slot)
+        btn['image'] = icon
+        btn.pack()
         # photo = ImageTk.PhotoImage(Image.open(ICON_PATHS['start']))
         # print(photo.height())
         # # btn_start_timer['image'] = photo.subsample(1, 1) # Resizing image to fit on button
@@ -197,7 +207,7 @@ class StopwatchSlot(Frame, Converters):
         return decoded
 
     def add_button(self):
-        btn_reset_timer = tk.Button(self.root, text='Add New Timer', fg='red', width=10,
+        btn_reset_timer = tk.Button(self, text='Add New Timer', fg='red', width=10,
                                     command=self.add_new)  # reset
         btn_reset_timer.pack(padx=self.padxs[4], pady=self.pady, side=tk.BOTTOM)
         pass
