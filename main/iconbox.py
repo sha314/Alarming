@@ -17,7 +17,20 @@ class IconBox:
     def get_keys(self):
         return self.keys
 
+    def get_all(self, width=20, height=20):
+        icons = dict()
+        for key in self.keys:
+            img = Image.open(self.ICON_PATHS[key])
+            img = img.resize((width, height), Image.ANTIALIAS)
+            photoImg = ImageTk.PhotoImage(img)
+            icons[key] = photoImg
+            pass
+        return icons
+
     def get(self, key, width=20, height=20):
+        if key not in self.keys:
+            print("unknow key")
+
         img = Image.open(self.ICON_PATHS[key])
         img = img.resize((width, height), Image.ANTIALIAS)
         photoImg = ImageTk.PhotoImage(img)
@@ -32,7 +45,7 @@ def main():
     # root.iconphoto(False, tk.PhotoImage(file='/path/to/ico/icon.png')) # or this
 
     iconbox = IconBox()
-    icon = iconbox.get('delete')
+    icon = iconbox.get('stop')
     print(iconbox.get_keys())
     btn = tk.Button(root)
     btn['image'] = icon
