@@ -12,19 +12,24 @@ class StopwatchSlot:
     def __init__(self, root):
         self.root = root
         # super(StopwatchSlot, self).__init__(root)
-        self.slot_count=1
+        self.slot_count=0
         self.slot_frame_list = []
         self.pady = 2
         self.padxs = [1, 2, 15, 2, 2, 2]
         self.widths = [5, 6, 15, 5, 5, 5]
         self.height = 1
         self.slots = []
+        self.construct()
         self.add_new_slot()
         pass
 
+    def construct(self):
+        self.btn_add_new_slot = tk.Button(self.root, text="New", command=self.add_new_slot)
+        self.btn_add_new_slot.pack(side=tk.BOTTOM)
+
     def add_new_slot(self):
         self.slot_count += 1
-        self.slots.append(Slot(self.root))
+        self.slots.append(Slot(self.root, self.slot_count))
 
 
 class Slot:
@@ -36,13 +41,13 @@ class Slot:
         self.master = master
         self.slot_id = id
         # super().__init__(master)
-        photo = tk.PhotoImage(file=r"../resources/icon/png/delete.png")
-        self.icon = photo.subsample(2, 2)  # Resizing image to fit on button
+        # photo = tk.PhotoImage(file=r"../resources/icon/png/delete.png")
+        # self.icon = photo.subsample(2, 2)  # Resizing image to fit on button
         self.padxs = [1, 2, 15, 2, 2, 2]
-        self.widths = [5, 6, 15, 5, 5, 5]
+        self.widths = [5, 8, 15, 5, 5, 5]
         self.height = 1
         self.pady=1
-
+        self.status = False # false means not running
         self.icons = iconbox.IconBox().get_all(25, 25)
         self.construct()
 
@@ -57,7 +62,9 @@ class Slot:
 
         self.lbl_id = Label(self.frame_slot, text="{}".format(self.slot_id).format(self.slot_id), width=self.widths[0])
         self.lbl_status = Label(self.frame_slot, text="N/A".format(self.slot_id), width=self.widths[1])
-        self.entry_time = Entry(self.frame_slot, width=self.widths[2])
+        self.duration = tk.StringVar()
+        self.entry_time = Entry(self.frame_slot, width=self.widths[2], textvariable=self.duration)
+        self.duration.set("0h0m0s")
         self.btn_start_timer = tk.Button(self.frame_slot,)  # start/stop
         self.btn_reset_timer = tk.Button(self.frame_slot, )  # reset
         self.btn_remove_timer = tk.Button(self.frame_slot,)  # reset
@@ -65,6 +72,8 @@ class Slot:
         ## commands
         # self.btn_remove_timer['command'] = lambda arg=frame_slot: self.clicked_btn_delete(
         #     arg)  # lambda function that calls another function with argument
+        self.btn_start_timer['command'] = self.clicked_btn_start
+        self.btn_reset_timer['command'] = self.clicked_btn_reset
         self.btn_remove_timer['command'] = self.clicked_btn_delete
 
         ## icon
@@ -90,12 +99,28 @@ class Slot:
         self.lbl_id['text'] = "{}".format(id)
 
     def clicked_btn_start(self):
+        if not self.status:
+            self.btn_start_timer['image'] = self.icons['stop']
+            self.lbl_status['text'] = "Stopped"
+            self.status = True
+        else:
+            self.btn_start_timer['image'] = self.icons['start']
+            self.lbl_status['text'] = "Running"
+            self.status = False
+            pass
+        print(self.duration.get())
+        print("convert to second and start timer")
         pass
 
     def clicked_btn_stop(self):
         pass
 
     def clicked_btn_reset(self):
+        self.lbl_status['text'] = "Ready"
+        print(self.duration.get())
+        # self.duration="0h0m0s"
+        self.duration.set("0h0m0s")
+
         pass
 
     def clicked_btn_delete(self, reference=None):
