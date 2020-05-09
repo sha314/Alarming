@@ -3,10 +3,15 @@ from tkinter.ttk import Frame, Label, Entry, Button
 import tkinter as tk
 from PIL import Image, ImageTk
 import os
+import threading
+import time
 
 # local
 # import main.iconbox as iconbox
 import iconbox
+import converters
+
+
 
 class StopwatchSlot:
     def __init__(self, root):
@@ -47,8 +52,9 @@ class Slot:
         self.widths = [5, 8, 15, 5, 5, 5]
         self.height = 1
         self.pady=1
-        self.status = False # false means not running
+        self.is_running = False  # false means not running
         self.icons = iconbox.IconBox().get_all(25, 25)
+        self.duration = tk.StringVar()
         self.construct()
 
     def construct(self):
@@ -62,9 +68,8 @@ class Slot:
 
         self.lbl_id = Label(self.frame_slot, text="{}".format(self.slot_id).format(self.slot_id), width=self.widths[0])
         self.lbl_status = Label(self.frame_slot, text="N/A".format(self.slot_id), width=self.widths[1])
-        self.duration = tk.StringVar()
         self.entry_time = Entry(self.frame_slot, width=self.widths[2], textvariable=self.duration)
-        self.duration.set("0h0m0s")
+        self.duration.set("00:00:00")
         self.btn_start_timer = tk.Button(self.frame_slot,)  # start/stop
         self.btn_reset_timer = tk.Button(self.frame_slot, )  # reset
         self.btn_remove_timer = tk.Button(self.frame_slot,)  # reset
@@ -99,31 +104,65 @@ class Slot:
         self.lbl_id['text'] = "{}".format(id)
 
     def clicked_btn_start(self):
-        if not self.status:
+        if not self.is_running:
             self.btn_start_timer['image'] = self.icons['stop']
-            self.lbl_status['text'] = "Stopped"
-            self.status = True
+            self.lbl_status['text'] = "Running"
+            self.is_running = True
+
+            print("Current Thread ", threading.currentThread().ident)
+            self.seconds_to_sleep = converters.to_seconds(self.duration.get())
+            th = threading.Thread(target=self.run_timer)
+            th.start()
+
         else:
             self.btn_start_timer['image'] = self.icons['start']
-            self.lbl_status['text'] = "Running"
-            self.status = False
+            self.lbl_status['text'] = "Stopped"
+            self.is_running = False
+
             pass
+
         print(self.duration.get())
+        print(self.seconds_to_sleep, ' sec to sleep')
         print("convert to second and start timer")
         pass
 
-    def clicked_btn_stop(self):
+    def run_timer(self):
+        print("running timer ", threading.currentThread().ident)
+        strs = converters.seconds_to_hhmmss(self.seconds_to_sleep)
+        self.duration.set(strs)
+        seconds_to_sleep = self.seconds_to_sleep
+        while seconds_to_sleep > 0:
+            if not self.is_running:
+                break
+            time.sleep(1)
+            seconds_to_sleep -= 1
+            strs = converters.seconds_to_hhmmss(seconds_to_sleep)
+            self.duration.set(strs)
+            pass
+        print("Complete running")
+        self.stop_clock()
+
+    def stop_clock(self):
+        print("clicked_btn_stop")
+        # self.timer.join()
+        self.lbl_status['text'] = "Time Up"
+        self.duration.set("00:00:00")
+        self.btn_start_timer['image'] = self.icons['start']
+        self.lbl_status['text'] = "Stopped"
+        self.is_running = False
         pass
 
     def clicked_btn_reset(self):
+        self.stop_clock()
         self.lbl_status['text'] = "Ready"
         print(self.duration.get())
-        # self.duration="0h0m0s"
-        self.duration.set("0h0m0s")
+        strs = converters.seconds_to_hhmmss(self.seconds_to_sleep)
+        self.duration.set(strs)
 
         pass
 
     def clicked_btn_delete(self, reference=None):
+        self.stop_clock()
         print("clicked_btn_delete")
         self.frame_slot.destroy()
         # if reference is not None:
@@ -156,7 +195,8 @@ def main():
     # root.iconbitmap('../resources/png/icon.ico') # main icon
     # root.iconphoto(False, tk.PhotoImage(file='/path/to/ico/icon.png')) # or this
 
-    app = StopwatchSlot(root)
+    # app = StopwatchSlot(root)
+    app = Slot(root)
     # app.add_new()
     # app.add_new()
     # app.add_new()
