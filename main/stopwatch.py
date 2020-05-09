@@ -195,8 +195,8 @@ def main():
     # root.iconbitmap('../resources/png/icon.ico') # main icon
     # root.iconphoto(False, tk.PhotoImage(file='/path/to/ico/icon.png')) # or this
 
-    # app = StopwatchSlot(root)
-    app = Slot(root)
+    app = StopwatchSlot(root)
+    # app = Slot(root)
     # app.add_new()
     # app.add_new()
     # app.add_new()
